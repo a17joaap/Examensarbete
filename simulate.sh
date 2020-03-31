@@ -1,16 +1,25 @@
 #!/bin/bash
-file="datasim.json"
-objects=2
-trackCounter=1
+file="gpsdata.json"
 elevationIncreaser=0.002
 latIncreaser=0.0002
 lonIncreaser=0.0002
 
-for i in {1..20}
+echo "," >> $file
+echo "\"Track14\": [" >> $file
+echo "[" >> $file
+for i in {1..990000}
 do
-    elevationLine=$( tail -3 $file | head -1 )
-    lonLine=$( tail -4 $file | head -1 )
-    latLine=$( tail -5 $file | head -1 )
+    if [[ i -eq 1 ]]
+    then
+        elevationLine=$( tail -7 $file | head -1 )
+        lonLine=$( tail -8 $file | head -1 )
+        latLine=$( tail -9 $file | head -1 )
+    else
+        elevationLine=$( tail -3 $file | head -1 )
+        lonLine=$( tail -4 $file | head -1 )
+        latLine=$( tail -5 $file | head -1 )
+        echo "," >> $file
+    fi
 
     elevation=$(echo $elevationLine | grep -Po "(?<=\:).*?(?=\,)")
     longitude=$(echo $lonLine | grep -Po "(?<=\:).*?(?=\,)")
@@ -50,7 +59,6 @@ do
     fi
     newLatitude=$(echo $latitude + $latIncreaser | bc -l)
 
-    echo "," >> $file
     echo "{" >> $file
     echo "\"lat\": $newLatitude," >> $file
     echo "\"lon\": $newLongitude," >> $file
@@ -58,3 +66,6 @@ do
     echo "\"time\": $timestamp" >> $file
     echo "}" >> $file
 done
+echo "]" >> $file
+echo "]" >> $file
+echo "}" >> $file
