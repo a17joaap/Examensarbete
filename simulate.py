@@ -5,8 +5,11 @@ import random
 
 objects = 1200000
 latitude = 40.1234567
-longitude = 100.7654321
+longitude = 119.9999999
 elevation = 60.4206900
+latDecreasing = False
+lonDecreasing = False
+eleDecreasing = False
 
 objectsArray = []
 
@@ -14,26 +17,41 @@ now = datetime.now()
 
 for i in range(objects):
     increment = round(random.uniform(0.0001, 0.1), 4)
-    if latitude > 60:
-        latIncrement = abs(increment)
+    if latDecreasing:
+        latIncrement = increment * -1
     else:
         latIncrement = increment
 
-    if longitude > 120:
-        lonIncrement = abs(increment)
+    if lonDecreasing:
+        lonIncrement = increment * -1
     else:
         lonIncrement = increment
     
-    if elevation > 80:
-        eleIncrement = abs(increment)
+    if eleDecreasing:
+        eleIncrement = increment * -1
     else:
         eleIncrement = increment
 
     latitude += latIncrement
+    if latitude > 60:
+        latDecreasing = True
+    elif latitude < 30:
+        latDecreasing = False
+        
     longitude += lonIncrement
+    if longitude > 120:
+        lonDecreasing = True
+    elif longitude < 70:
+        lonDecreasing = False
+
     elevation += eleIncrement
+    if elevation > 80:
+        eleDecreasing = True
+    elif elevation < 20:
+        eleDecreasing = False
+
     time = now + timedelta(seconds=random.randint(1,11))
-    if (i % 41) == 0:
+    if (i % 40000) == 0:
         time = now + timedelta(days=1)
     timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ")
     now = time
@@ -53,4 +71,3 @@ file.write('"Track13": [\n')
 file.write(json)
 file.write("\n]\n}")
 file.close()
-
