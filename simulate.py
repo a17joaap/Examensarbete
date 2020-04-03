@@ -1,37 +1,42 @@
 from datetime import datetime
+from datetime import timedelta
 import json
+import random
 
 objects = 1200000
 latitude = 40.1234567
-latIncrement = 0.0002
 longitude = 100.7654321
-lonIncrement = 0.0002
 elevation = 60.4206900
-eleIncrement = 0.0002
 
 objectsArray = []
 
+now = datetime.now()
+
 for i in range(objects):
+    increment = round(random.uniform(0.0001, 0.1), 4)
     if latitude > 60:
-        latIncrement = -0.0002
-    elif latitude < 20:
-        latIncrement = 0.0002
+        latIncrement = abs(increment)
+    else:
+        latIncrement = increment
 
     if longitude > 120:
-        lonIncrement = -0.0002
-    elif longitude < 80:
-        lonIncrement = 0.0002
+        lonIncrement = abs(increment)
+    else:
+        lonIncrement = increment
     
     if elevation > 80:
-        eleIncrement = -0.0002
-    elif elevation < 30:
-        eleIncrement = 0.0002
-    
+        eleIncrement = abs(increment)
+    else:
+        eleIncrement = increment
+
     latitude += latIncrement
     longitude += lonIncrement
     elevation += eleIncrement
-    now = datetime.now()
-    timestamp = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    time = now + timedelta(seconds=random.randint(1,11))
+    if (i % 41) == 0:
+        time = now + timedelta(days=1)
+    timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ")
+    now = time
 
     obj = {
         "lat": round(latitude, 7),
