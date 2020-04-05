@@ -1,4 +1,5 @@
-//Binary search tree
+//Binary search tree - From: https://www.geeksforgeeks.org/implementation-binary-search-tree-javascript/
+
 class Node {
     constructor(data) {
         this.key = getDistanceFromLatLonInKm(data.lat, data.lon);

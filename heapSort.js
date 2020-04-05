@@ -32,6 +32,7 @@ class MaxHeap {
         this.items[second] = temp;
     }
 
+    // Heapify - From: https://www.w3resource.com/javascript-exercises/searching-and-sorting-algorithm/searching-and-sorting-algorithm-exercise-3.php
     heapify(i) {
         const left = 2 * i + 1;
         const right = left + 1;

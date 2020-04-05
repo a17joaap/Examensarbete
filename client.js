@@ -142,6 +142,7 @@ function enableButtons() {
     heapButton.disabled = false;
 }
 
+
 // Haversine formula - From: https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
 function getDistanceFromLatLonInKm(lat, lon) {
     var R = 6371; // Radius of the earth in km

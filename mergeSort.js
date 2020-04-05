@@ -1,3 +1,5 @@
+//Merge sort algorithm - From: https://medium.com/javascript-in-plain-english/javascript-merge-sort-3205891ac060
+
 function mergeSort(arr) {
     if (arr.length <= 1) {
         return arr;
