@@ -1,18 +1,16 @@
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 
 const connection = new WebSocket('ws://localhost:3000');
-const treeButton = document.getElementById('treeButton');
-const mergeButton = document.getElementById('mergeButton');
-const heapButton = document.getElementById('heapButton');
-
+const button = document.getElementById('get-stream');
+const resultsBox = document.getElementById('resultsbox');
+const processingContainer = document.getElementById('processingContainer');
 
 //Lidköpings latitud och longitud
 const lidLat = 58.50517;
 const lidLon = 13.15765;
 
-const tree = new BinarySearchTree();
-const heap = new MaxHeap();
-let sortedTree = [];
+let tree = new BinarySearchTree();
+let heap = new MaxHeap();
 let mergeQueue = [];
 
 let treeSortActive = false;
@@ -20,22 +18,26 @@ let mergeSortActive = false;
 let heapSortActive = false;
 
 
-treeButton.addEventListener('click', () => {
+button.addEventListener('click', () => {
+    const algorithm = document.querySelector('input[name="algorithm"]:checked');
+    if (!algorithm) {
+        alert('Pick an algorithm');
+        return;
+    }
+    switch (algorithm.value) {
+        case 'tree':
+            treeSortActive = true;
+            break;
+        case 'merge':
+            mergeSortActive = true;
+            break;
+        case 'heap':
+            heapSortActive = true;
+            break;
+    }
+    toggleProcessingBox();
     connection.send('hejhej');
-    disableButtons();
-    treeSortActive = true;
-})
-
-mergeButton.addEventListener('click', () => {
-    connection.send('hejhej');
-    disableButtons();
-    mergeSortActive = true;
-})
-
-heapButton.addEventListener('click', () => {
-    connection.send('hejhej');
-    disableButtons();
-    heapSortActive = true;
+    button.disabled = true;
 })
 
 connection.onopen = () => {
@@ -55,23 +57,25 @@ connection.onmessage = (message) => {
         // End time
         if (treeSortActive) {
             treeSort(null, true);
+            tree = new BinarySearchTree();
         }
 
         if (mergeSortActive) {
             mergeSortFinish();
+            mergeQueue = [];
         }
 
         if (heapSortActive) {
             const res = heap.sort().splice(0, 11);
-            res.forEach((obj) => {
-                console.log(getDistanceFromLatLonInKm(obj.lat, obj.lon))
-            })
+            displayResult(res);
+            heap = new MaxHeap();
         }
 
         treeSortActive = false;
         mergeSortActive = false;
         heapSortActive = false;
-        enableButtons();
+        button.disabled = false;
+        toggleProcessingBox();
 
         return;
     }
@@ -106,13 +110,35 @@ connection.onmessage = (message) => {
     }
 }
 
+function toggleProcessingBox() {
+    if (processingContainer.style.display === 'block') {
+        processingContainer.style.display = 'none';
+    } else {
+        processingContainer.style.display = 'block';
+        if (document.getElementById('result-list')) {
+            resultsBox.removeChild(document.getElementById('result-list'));
+        }
+    }
+}
+
+function displayResult(res) {
+    const list = document.createElement('ul');
+    list.id = 'result-list';
+
+    res.forEach((obj) => {
+        const item = document.createElement('li');
+        item.innerHTML = JSON.stringify(obj);
+        list.appendChild(item);
+    })
+
+    resultsBox.appendChild(list);
+}
+
 function treeSort(obj, finished) {
     if (finished) {
         tree.inorder(tree.root);
         let res = tree.getSorted();
-        res.splice(0, 11).forEach((obj) => {
-            console.log(getDistanceFromLatLonInKm(obj.lat, obj.lon))
-        })
+        displayResult(res.splice(0, 11));
     } else {
         tree.insert(obj)
     }
@@ -125,23 +151,8 @@ function mergeSortFinish() {
         mergeQueue.splice(i, 1);
     }
     let res = mergeQueue[0].splice(0, 11);
-    res.forEach((obj) => {
-        console.log(getDistanceFromLatLonInKm(obj.lat, obj.lon))
-    })
+    displayResult(res);
 }
-
-function disableButtons() {
-    treeButton.disabled = true;
-    mergeButton.disabled = true;
-    heapButton.disabled = true;
-}
-
-function enableButtons() {
-    treeButton.disabled = false;
-    mergeButton.disabled = false;
-    heapButton.disabled = false;
-}
-
 
 // Haversine formula - From: https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
 function getDistanceFromLatLonInKm(lat, lon) {
