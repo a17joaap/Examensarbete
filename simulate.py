@@ -3,9 +3,9 @@ from datetime import timedelta
 import json
 import random
 
-objects = 1200000
+objects = 400000
 latitude = 40.1234567
-longitude = 119.9999999
+longitude = 10.9999999
 elevation = 60.4206900
 latDecreasing = False
 lonDecreasing = False
@@ -39,9 +39,9 @@ for i in range(objects):
         latDecreasing = False
         
     longitude += lonIncrement
-    if longitude > 120:
+    if longitude > 80:
         lonDecreasing = True
-    elif longitude < 70:
+    elif longitude < 5:
         lonDecreasing = False
 
     elevation += eleIncrement
@@ -51,7 +51,7 @@ for i in range(objects):
         eleDecreasing = False
 
     time = now + timedelta(seconds=random.randint(1,11))
-    if (i % 40000) == 0:
+    if (i % 10000) == 0:
         time = now + timedelta(days=1)
     timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ")
     now = time
@@ -65,9 +65,9 @@ for i in range(objects):
     objectsArray.append(obj)
 
 json = json.dumps(objectsArray, indent=4)
-file = open("gpsdata.json", "a")
-file.write(",\n")
-file.write('"Track13": [\n')
+file = open("gpsdata2.json", "a")
+file.write("{\n")
+file.write('"points": \n')
 file.write(json)
-file.write("\n]\n}")
+file.write("\n}")
 file.close()
