@@ -19,8 +19,8 @@ wsServer.on('request', (req) => {
 
     connection.on('message', (_) => {
         connection.send('Start');
-        while (objects.length > 0) {
-            toSend = objects.splice(0, 100);
+        for (let i = 0; i <= 390000; i += 100) {
+            toSend = objects.slice(i, i + 100);
             connection.send(JSON.stringify(toSend));
         }
         connection.send('End');
