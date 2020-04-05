@@ -1,7 +1,10 @@
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 
 const connection = new WebSocket('ws://localhost:3000');
-const jsonButton = document.getElementById('jsonButton');
+const treeButton = document.getElementById('treeButton');
+const mergeButton = document.getElementById('mergeButton');
+const heapButton = document.getElementById('heapButton');
+
 
 //Lidköpings latitud och longitud
 const lidLat = 58.50517;
@@ -12,8 +15,27 @@ const heap = new MaxHeap();
 let sortedTree = [];
 let mergeQueue = [];
 
-jsonButton.addEventListener('click', () => {
+let treeSortActive = false;
+let mergeSortActive = false;
+let heapSortActive = false;
+
+
+treeButton.addEventListener('click', () => {
     connection.send('hejhej');
+    disableButtons();
+    treeSortActive = true;
+})
+
+mergeButton.addEventListener('click', () => {
+    connection.send('hejhej');
+    disableButtons();
+    mergeSortActive = true;
+})
+
+heapButton.addEventListener('click', () => {
+    connection.send('hejhej');
+    disableButtons();
+    heapSortActive = true;
 })
 
 connection.onopen = () => {
@@ -26,50 +48,62 @@ connection.onerror = (err) => {
 
 connection.onmessage = (message) => {
     if (message.data === "Start") {
-        console.log("nu kör vi" + new Date());
-        array = [];
+        // Start time
         return;
     }
     if (message.data === "End") {
-        console.log("klar!" + new Date());
+        // End time
+        if (treeSortActive) {
+            treeSort(null, true);
+        }
 
-        treeSort(null, true);
+        if (mergeSortActive) {
+            mergeSortFinish();
+        }
 
-        /*         const res = heap.sort().splice(0, 11);
-                res.forEach((obj) => {
-                    console.log(getDistanceFromLatLonInKm(obj.lat, obj.lon))
-                }) */
+        if (heapSortActive) {
+            const res = heap.sort().splice(0, 11);
+            res.forEach((obj) => {
+                console.log(getDistanceFromLatLonInKm(obj.lat, obj.lon))
+            })
+        }
 
-        //mergeSortFinish();
+        treeSortActive = false;
+        mergeSortActive = false;
+        heapSortActive = false;
+        enableButtons();
 
         return;
     }
     const arr = JSON.parse(message.data);
 
-    // Tree Sort
-    arr.forEach((obj) => {
-        treeSort(obj, false);
-    })
+    if (treeSortActive) {
+        arr.forEach((obj) => {
+            treeSort(obj, false);
+        })
+    }
 
-    /* Heap Sort 
-    arr.forEach((obj) => {
-        heap.push(obj);
-    }) */
+    if (heapSortActive) {
+        arr.forEach((obj) => {
+            heap.push(obj);
+        })
+    }
 
-    /* Merge Sort 
-    partition = mergeSort(arr);
-    mergeQueue.push(partition);
-    partition = null;
-    if (mergeQueue.length > 1) {
-        for (let i = 0; i < mergeQueue.length - 1; i++) {
-            if (mergeQueue[i].length === mergeQueue[i + 1].length) {
-                mergedSection = merge(mergeQueue[i], mergeQueue[i + 1]);
-                mergeQueue[i] = mergedSection;
-                mergeQueue.splice(i + 1, 1);
-                i = 0;
+    if (mergeSortActive) {
+        partition = mergeSort(arr);
+        mergeQueue.push(partition);
+        partition = null;
+        if (mergeQueue.length > 1) {
+            for (let i = 0; i < mergeQueue.length - 1; i++) {
+                if (mergeQueue[i].length === mergeQueue[i + 1].length) {
+                    mergedSection = merge(mergeQueue[i], mergeQueue[i + 1]);
+                    mergeQueue[i] = mergedSection;
+                    mergeQueue.splice(i + 1, 1);
+                    i = 0;
+                }
             }
         }
-    }  */
+    }
 }
 
 function treeSort(obj, finished) {
@@ -96,6 +130,19 @@ function mergeSortFinish() {
     })
 }
 
+function disableButtons() {
+    treeButton.disabled = true;
+    mergeButton.disabled = true;
+    heapButton.disabled = true;
+}
+
+function enableButtons() {
+    treeButton.disabled = false;
+    mergeButton.disabled = false;
+    heapButton.disabled = false;
+}
+
+// Haversine formula - From: https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
 function getDistanceFromLatLonInKm(lat, lon) {
     var R = 6371; // Radius of the earth in km
     var dLat = deg2rad(lat - lidLat);  // deg2rad below
