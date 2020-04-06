@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ZJiV8pZ/62NhAPD3NDD1jLd2QAMNPaUwDX5Ay05Rn6s3jX+S2P/wGoDYFHG+DbOvUluF2kSNSwiNY/7v8oA/4A==",
+  "success": true,
+  "projectFilePath": "E:\\SKOLGREJER\\Examen\\code\\aspnet\\Examen\\Examen.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Jocke\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
