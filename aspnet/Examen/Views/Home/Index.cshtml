@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>Sort streaming JSON data</h1>
+<div id='options' class='container'>
+    <div id='selectionbox'>
+        <span>
+            <input type='radio' id='tree' name='algorithm' value='tree'>
+            <label for='tree'>Tree sort</label>
+        </span>
+        <span>
+            <input type='radio' id='merge' name='algorithm' value='merge'>
+            <label for='merge'>Merge sort</label>
+        </span>
+        <span>
+            <input type='radio' id='heap' name='algorithm' value='heap'>
+            <label for='heap'>Heap sort</label>
+        </span>
+    </div>
+    <button id='get-stream' class='container'>Start stream</button>
+</div>
+<div id='resultsbox' class='container'>
+    <div id='processingContainer'>
+        <div id='animationContainer'></div>
+        <p>Processing stream...</p>
+    </div>
+</div>
