@@ -33,11 +33,14 @@ namespace Examen.Controllers
         [HttpGet]
         public string GetResult()
         {
-            while (Program.finishedSorting == false)
-            {
-
-            }
+            while (Program.finishedSorting == false) ;
             return JsonConvert.SerializeObject(Program.result);
+        }
+
+        [HttpPost]
+        public void StartStream(string algorithm)
+        {
+            Program.StartStream(algorithm);
         }
     }
 }
