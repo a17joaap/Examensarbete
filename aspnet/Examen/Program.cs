@@ -22,6 +22,7 @@ namespace Examen
         public static List<GPSData> result;
         public static Boolean finishedSorting = false;
         public static Boolean finishedSnorting = false;
+        private static ClientWebSocket webSocket = null;
 
         public static void Main(string[] args)
         {
@@ -38,7 +39,6 @@ namespace Examen
 
         public static async Task Connect()
         {
-            ClientWebSocket webSocket = null;
             try
             {
                 string url = "ws://localhost:3000";
@@ -59,6 +59,31 @@ namespace Examen
             }
         }
 
+        public static void StartStream(string algorithm)
+        {
+            switch (algorithm)
+            {
+                case "tree":
+                    treeSort = true;
+                    mergeSort = false;
+                    heapSort = false;
+                    break;
+                case "merge":
+                    mergeSort = true;
+                    heapSort = false;
+                    treeSort = false;
+                    break;
+                case "heap":
+                    heapSort = true;
+                    treeSort = false;
+                    mergeSort = false;
+                    break;
+            }
+            byte[] sendBytes = Encoding.UTF8.GetBytes("hej");
+            var sendBuffer = new ArraySegment<byte>(sendBytes);
+            webSocket.SendAsync(sendBuffer, WebSocketMessageType.Text, true, CancellationToken.None);
+        } 
+
         public static async Task OnMessage(ClientWebSocket webSocket)
         {
             var bytes = new byte[10240];
@@ -78,27 +103,21 @@ namespace Examen
                     {
                         byte[] msgBytes = buffer.Skip(buffer.Offset).Take(result.Count).ToArray();
                         string message = Encoding.UTF8.GetString(msgBytes);
-
-                        if (message == "Tree")
+                        if (message == "Start")
                         {
-                            tree = new BinarySearchTree();
-                            treeSort = true;
-                            mergeSort = false;
-                            heapSort = false;
-                        }
-                        else if (message == "Merge")
-                        {
-                            merge = new MergeSort();
-                            treeSort = false;
-                            mergeSort = true;
-                            heapSort = false;
-                        }
-                        else if (message == "Heap")
-                        {
-                            heap = new MaxHeap();
-                            treeSort = false;
-                            mergeSort = false;
-                            heapSort = true;
+                            finishedSorting = false;
+                            if (treeSort)
+                            {
+                                tree = new BinarySearchTree();
+                            }
+                            else if (mergeSort)
+                            {
+                                merge = new MergeSort();
+                            }
+                            else if (heapSort)
+                            {
+                                heap = new MaxHeap();
+                            }
                         }
                         else if (message == "End")
                         {
@@ -162,6 +181,7 @@ namespace Examen
             {
                 tree.Inorder(tree.root);
                 result = tree.sorted.Take(10).ToList();
+                tree = null;
             }
             else if (mergeSort)
             {
@@ -172,10 +192,12 @@ namespace Examen
                     merge.queue.RemoveAt(i);
                 }
                 result = merge.queue[0].Take(10).ToList();
+                merge = null;
             }
             else if (heapSort)
             {
                 result = heap.Sort().Take(10).ToList();
+                heap = null;
             }
             finishedSorting = true;
         }
