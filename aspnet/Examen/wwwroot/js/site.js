@@ -1,7 +1,4 @@
-﻿window.WebSocket = window.WebSocket || window.MozWebSocket;
-
-const connection = new WebSocket("ws://localhost:3000");
-const button = document.getElementById("get-stream");
+﻿const button = document.getElementById("get-stream");
 const resultsBox = document.getElementById("resultsbox");
 const processingContainer = document.getElementById("processingContainer");
 
@@ -13,15 +10,21 @@ button.addEventListener("click", () => {
         return;
     }
     toggleProcessingBox();
-    connection.send("hejhej");
     button.disabled = true;
+    let ajaxURL = "/Home/StartStream/?algorithm=" + algorithm.value;
+    $.ajax({
+        type: "POST",
+        url: ajaxURL,
+        success: function (res, status, xhr) {
+            waitForResult();
+        },
+        error: function (xhr, status, error) {
+            console.log(error);
+        }
+    });
 });
 
-connection.onerror = (err) => {
-    console.log(err);
-};
-
-connection.onmessage = (message) => {
+function waitForResult() {
     $.ajax({
         type: "GET",
         url: "/Home/GetResult",
@@ -32,7 +35,7 @@ connection.onmessage = (message) => {
             console.log(error);
         }
     });
-};
+}
 
 function toggleProcessingBox() {
     if (processingContainer.style.display === "block") {
@@ -58,4 +61,5 @@ function displayResult(input) {
     });
 
     resultsBox.appendChild(list);
+    button.disabled = false;
 }
