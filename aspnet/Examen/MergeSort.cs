@@ -30,39 +30,28 @@ namespace Examen
         public List<GPSData> Merge(List<GPSData> left, List<GPSData> right)
         {
             List<GPSData> res = new List<GPSData>();
+            int leftIdx = 0;
+            int rightIdx = 0;
 
-
-            while (left.Count > 0 || right.Count > 0)
+            while (leftIdx < left.Count && rightIdx < right.Count)
             {
-                if (left.Count > 0 && right.Count > 0)
+                double firstDistance = haversine.getDistance(left.First().lat, left.First().lon);
+                double secondDistance = haversine.getDistance(right.First().lat, right.First().lon);
+                if (firstDistance < secondDistance)
                 {
-                    double firstDistance = haversine.getDistance(left.First().lat, left.First().lon);
-                    double secondDistance = haversine.getDistance(right.First().lat, right.First().lon);
-
-                    if (firstDistance < secondDistance)
-                    {
-                        res.Add(left.First());
-                        left.Remove(left.First());
-                    }
-                    else
-                    {
-                        res.Add(right.First());
-                        right.Remove(right.First());
-                    }
-                }
-                else if (left.Count > 0)
+                    res.Add(left[leftIdx]);
+                    leftIdx++;
+                } else
                 {
-                    res.Add(left.First());
-                    left.Remove(left.First());
-                }
-                else if (right.Count > 0)
-                {
-                    res.Add(right.First());
-                    right.Remove(right.First());
+                    res.Add(right[rightIdx]);
+                    rightIdx++;
                 }
             }
 
+            res.AddRange(left.Skip(leftIdx).ToList());
+            res.AddRange(right.Skip(rightIdx).ToList());
             return res;
+
         }
     }
 }
