@@ -140,9 +140,7 @@ namespace Examen
             {
                 Inorder(node.left);
                 sorted.Add(node.data);
-                Node right = node.right;
-                Remove(node);
-                Inorder(right);
+                Inorder(node.right);
             }
         }
     }
