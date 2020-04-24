@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using System.Text;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace Examen
 {
@@ -21,8 +22,12 @@ namespace Examen
         private static MaxHeap heap;
         public static List<GPSData> result;
         public static Boolean finishedSorting = false;
-        public static Boolean finishedSnorting = false;
         private static ClientWebSocket webSocket = null;
+        private static List<long> memUsageList = new List<long>();
+        private static long memUsageBefore;
+        private static long memUsageAfter;
+        private static string csvPath;
+
 
         public static void Main(string[] args)
         {
@@ -105,6 +110,7 @@ namespace Examen
                         string message = Encoding.UTF8.GetString(msgBytes);
                         if (message == "Start")
                         {
+                            memUsageBefore = GC.GetTotalMemory(false);
                             finishedSorting = false;
                             if (treeSort)
                             {
@@ -182,6 +188,7 @@ namespace Examen
                 tree.Inorder(tree.root);
                 result = tree.sorted.Take(10).ToList();
                 tree = null;
+                csvPath = @"E:\SKOLGREJER\Examen\analys\TreeMemUsage_NET.csv";
             }
             else if (mergeSort)
             {
@@ -193,13 +200,23 @@ namespace Examen
                 }
                 result = merge.queue[0].Take(10).ToList();
                 merge = null;
+                csvPath = @"E:\SKOLGREJER\Examen\analys\MergeMemUsage_NET.csv";
             }
             else if (heapSort)
             {
                 result = heap.Sort().Take(10).ToList();
                 heap = null;
+                csvPath = @"E:\SKOLGREJER\Examen\analys\HeapMemUsage_NET.csv";
             }
             finishedSorting = true;
+            memUsageAfter = GC.GetTotalMemory(false);
+            memUsageList.Add(memUsageAfter - memUsageBefore);
+            GC.Collect();
+            if (memUsageList.Count == 101)
+            {
+                string csv = String.Join("\n", memUsageList.Select(x => x.ToString()).ToArray());
+                File.WriteAllText(csvPath, csv);
+            }
         }
 
 
