@@ -34,10 +34,10 @@
 
   respondToVisibility(container, (visible) => {
     if (visible) {
-      startTime = new Date().getTime();
+      startTime = performance.now();
     } else {
       if (startTime) {
-        endTime = new Date().getTime();
+        endTime = performance.now();
         result = endTime - startTime;
         times.push(result);
         if (times.length == TIMES_TO_RECORD) {
@@ -48,6 +48,8 @@
       }
     }
   });
+
+
 
   function writeToCSV() {
     let csv = "data:text/csv;charset=utf-8, ";
