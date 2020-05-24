@@ -110,7 +110,7 @@ namespace Examen
                         string message = Encoding.UTF8.GetString(msgBytes);
                         if (message == "Start")
                         {
-                            memUsageBefore = GC.GetTotalMemory(false);
+                            memUsageBefore = GC.GetTotalAllocatedBytes(true);
                             finishedSorting = false;
                             if (treeSort)
                             {
@@ -188,7 +188,7 @@ namespace Examen
                 tree.Inorder(tree.root);
                 result = tree.sorted.Take(10).ToList();
                 tree = null;
-                csvPath = @"E:\SKOLGREJER\Examen\analys\TreeMemUsage_NET.csv";
+                csvPath = @"E:\SKOLGREJER\Examen\analys\ServerTreeMem.csv";
             }
             else if (mergeSort)
             {
@@ -200,19 +200,19 @@ namespace Examen
                 }
                 result = merge.queue[0].Take(10).ToList();
                 merge = null;
-                csvPath = @"E:\SKOLGREJER\Examen\analys\MergeMemUsage_NET.csv";
+                csvPath = @"E:\SKOLGREJER\Examen\analys\ServerMergeMem.csv";
             }
             else if (heapSort)
             {
                 result = heap.Sort().Take(10).ToList();
                 heap = null;
-                csvPath = @"E:\SKOLGREJER\Examen\analys\HeapMemUsage_NET.csv";
+                csvPath = @"E:\SKOLGREJER\Examen\analys\ServerHeapMem.csv";
             }
             finishedSorting = true;
-            memUsageAfter = GC.GetTotalMemory(false);
+            memUsageAfter = GC.GetTotalAllocatedBytes(true);
             memUsageList.Add(memUsageAfter - memUsageBefore);
             GC.Collect();
-            if (memUsageList.Count == 101)
+            if (memUsageList.Count == 500)
             {
                 string csv = String.Join("\n", memUsageList.Select(x => x.ToString()).ToArray());
                 File.WriteAllText(csvPath, csv);
